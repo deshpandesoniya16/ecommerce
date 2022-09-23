@@ -50,6 +50,10 @@ export const myOrders = () => async (dispatch) => {
 
     const { data } = await axios.get("/api/v1/orders/me");
 
+    const data2  = await axios.get("/api/v1/orders/monthly_sale_report"); 
+
+    console.log(data2.data, 'data2data2data2data2data2data2');
+
     dispatch({ type: MY_ORDERS_SUCCESS, payload: data.orders });
   } catch (error) {
     dispatch({

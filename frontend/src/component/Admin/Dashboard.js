@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Sidebar from "./Sidebar.js";
 import "./dashboard.css";
-import { Typography } from "@material-ui/core";
+import { Typography, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Doughnut, Line } from "react-chartjs-2";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,6 +9,30 @@ import { getAdminProduct } from "../../actions/productAction";
 import { getAllOrders } from "../../actions/orderAction.js";
 import { getAllUsers } from "../../actions/userAction.js";
 import MetaData from "../layout/MetaData";
+
+
+const _downloadReport = async (url, name) => {
+  const response = await fetch(url);
+  const data = await response.text();
+  const blob = new Blob([data], { type: "data:text/csv;charset=utf-8," });
+  const blobURL = window.URL.createObjectURL(blob);
+  console.log(response, 'data');
+
+  // Create new tag for download file
+  const anchor = document.createElement("a");
+  anchor.download = name;
+  anchor.href = blobURL;
+  anchor.dataset.downloadurl = ["text/csv", anchor.download, anchor.href].join(
+    ":"
+  );
+  anchor.click();
+
+  // Remove URL.createObjectURL. The browser should not save the reference to the file.
+  setTimeout(() => {
+    // For Firefox it is necessary to delay revoking the ObjectURL
+    URL.revokeObjectURL(blobURL);
+  }, 100);
+};
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -77,6 +101,9 @@ const Dashboard = () => {
               Total Amount <br /> ₹{totalAmount}
             </p>
           </div>
+          <Button variant="outlined" onClick={ () => { _downloadReport(
+            '/api/v1/orders/monthly_sale_report', 'monthly_report.csv'
+          ) }}> Download Monthly Report </Button>
           <div className="dashboardSummaryBox2">
             <Link to="/admin/products">
               <p>Product</p>
